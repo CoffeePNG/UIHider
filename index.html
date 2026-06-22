@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Clean Video">
+    <title>Clean Video UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #0f0f0f;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .detection {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .detection-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detection-site {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .detection-site.unknown {
+            color: #999;
+        }
+
+        .main-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .clean-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .clean-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .clean-btn.cleaned {
+            background: #4caf50;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .undo-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 25px;
+        }
+
+        .undo-btn:active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .options {
+            margin-bottom: 25px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            padding: 2px;
+            transition: all 0.2s;
+        }
+
+        .option input[type="checkbox"]:checked {
+            background: #667eea;
+        }
+
+        .option input[type="checkbox"]:checked::after {
+            content: '✓';
+            color: white;
+        }
+
+        .option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #4caf50;
+            opacity: 0;
+            transition: opacity 0.3s;
+            margin-top: 20px;
+        }
+
+        .status.show {
+            opacity: 1;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .instructions {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #ffc107;
+            margin-bottom: 25px;
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .info-section h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background: #fff;
+                color: #333;
+            }
+
+            .detection {
+                background: rgba(102, 126, 234, 0.05);
+            }
+
+            .detection-site.unknown {
+                color: #666;
+            }
+
+            .option {
+                background: rgba(0, 0, 0, 0.05);
+                border-color: rgba(0, 0, 0, 0.1);
+            }
+
+            .subtitle {
+                color: #666;
+            }
+
+            .footer {
+                color: #999;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🎬</div>
+        <h1>Clean Video</h1>
+        <p class="subtitle">Remove UI clutter from video sites</p>
+    </div>
+
+    <div class="detection">
+        <div class="detection-label">Current Site</div>
+        <div class="detection-site" id="siteName">Detecting...</div>
+    </div>
+
+    <button class="main-button clean-btn" id="cleanBtn" onclick="cleanCurrentSite()">
+        ✨ Clean This Page
+    </button>
+
+    <button class="main-button undo-btn" id="undoBtn" onclick="undoClean()" style="display: none;">
+        ↺ Restore UI
+    </button>
+
+    <div class="options">
+        <div class="option">
+            <input type="checkbox" id="hideComments" checked>
+            <label for="hideComments">Hide comments</label>
+        </div>
+        <div class="option">
+            <input type="checkbox" id="hideSidebar" checked>
+            <label for="hideSidebar">Hide sidebar/recommendations</label>
+        </div>
+        <div class="option">
+            <input type="checkbox" id="hideAds" checked>
+            <label for="hideAds">Hide ads & promotions</label>
+        </div>
+        <div class="option">
+            <input type="checkbox" id="hideMetadata" checked>
+            <label for="hideMetadata">Hide engagement metrics</label>
+        </div>
+    </div>
+
+    <div class="status" id="status">✓ Page cleaned!</div>
+
+    <div class="info-section">
+        <h3>How to use</h3>
+        <ol style="margin-left: 16px; line-height: 1.8;">
+            <li>Bookmark this page on your phone</li>
+            <li>Go to any video site</li>
+            <li>Come back and tap "Clean This Page"</li>
+            <li>Enjoy distraction-free videos</li>
+        </ol>
+    </div>
+
+    <div class="footer">
+        Works on YouTube, Vimeo, and most video sites
+    </div>
+
+    <script>
+        let isCurrentPageCleaned = false;
+        const hiddenElements = [];
+
+        function detectSite() {
+            const hostname = window.location.hostname;
+            const siteName = document.getElementById('siteName');
+
+            if (hostname.includes('youtube')) {
+                siteName.textContent = '🔴 YouTube';
+            } else if (hostname.includes('vimeo')) {
+                siteName.textContent = '🎨 Vimeo';
+            } else if (hostname.includes('reddit')) {
+                siteName.textContent = '🤖 Reddit';
+            } else if (hostname.includes('twitter') || hostname.includes('x.com')) {
+                siteName.textContent = '𝕏 Twitter/X';
+            } else if (hostname.includes('tiktok')) {
+                siteName.textContent = '🎵 TikTok';
+            } else if (hostname.includes('twitch')) {
+                siteName.textContent = '💜 Twitch';
+            } else if (hostname.includes('instagram')) {
+                siteName.textContent = '📸 Instagram';
+            } else {
+                siteName.classList.add('unknown');
+                siteName.textContent = hostname.replace('www.', '');
+            }
+        }
+
+        function cleanCurrentSite() {
+            if (isCurrentPageCleaned) return;
+
+            const hideComments = document.getElementById('hideComments').checked;
+            const hideSidebar = document.getElementById('hideSidebar').checked;
+            const hideAds = document.getElementById('hideAds').checked;
+            const hideMetadata = document.getElementById('hideMetadata').checked;
+
+            const selectors = [];
+
+            // YouTube specifics
+            selectors.push('#secondary');           // Sidebar
+            selectors.push('.ytp-endscreen-container');
+            selectors.push('ytd-compact-autoplay-toggle-renderer');
+
+            // Generic video sites
+            if (hideSidebar) {
+                selectors.push('[class*="recommend"]');
+                selectors.push('[class*="related"]');
+                selectors.push('[class*="sidebar"]');
+                selectors.push('[class*="trending"]');
+            }
+
+            if (hideComments) {
+                selectors.push('#comments');
+                selectors.push('[class*="comment"]');
+                selectors.push('.js-comments-section');
+            }
+
+            if (hideAds) {
+                selectors.push('[class*="ads"]');
+                selectors.push('[class*="ad-"]');
+                selectors.push('.advertisement');
+                selectors.push('[id*="ads"]');
+            }
+
+            if (hideMetadata) {
+                selectors.push('[class*="engagement"]');
+                selectors.push('[class*="share"]');
+                selectors.push('.yt-user-name');
+            }
+
+            // Apply hiding
+            selectors.forEach(selector => {
+                try {
+                    document.querySelectorAll(selector).forEach(el => {
+                        hiddenElements.push({ element: el, display: el.style.display });
+                        el.style.display = 'none';
+                    });
+                } catch (e) {}
+            });
+
+            // Maximize video player
+            try {
+                document.querySelectorAll('[role="main"], main, article, #primary').forEach(el => {
+                    hiddenElements.push({ element: el, maxWidth: el.style.maxWidth });
+                    el.style.maxWidth = '100%';
+                });
+            } catch (e) {}
+
+            isCurrentPageCleaned = true;
+            document.getElementById('cleanBtn').textContent = '✓ Cleaned!';
+            document.getElementById('cleanBtn').classList.add('cleaned');
+            document.getElementById('undoBtn').style.display = 'block';
+
+            // Show status message
+            const status = document.getElementById('status');
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 2000);
+        }
+
+        function undoClean() {
+            hiddenElements.forEach(item => {
+                if (item.display !== undefined) {
+                    item.element.style.display = item.display;
+                }
+                if (item.maxWidth !== undefined) {
+                    item.element.style.maxWidth = item.maxWidth;
+                }
+            });
+
+            hiddenElements.length = 0;
+            isCurrentPageCleaned = false;
+
+            document.getElementById('cleanBtn').textContent = '✨ Clean This Page';
+            document.getElementById('cleanBtn').classList.remove('cleaned');
+            document.getElementById('undoBtn').style.display = 'none';
+
+            const status = document.getElementById('status');
+            status.textContent = '↺ UI restored';
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 1500);
+        }
+
+        // Detect site on load
+        detectSite();
+
+        // Check if we're on this app's page itself
+        if (window.location.hostname === window.location.hostname && window.location.pathname === '/mobile.html' || window.location.pathname === '/') {
+            // We're on the app, disable the clean button functionality for this page
+        }
+    </script>
+</body>
+</html>
